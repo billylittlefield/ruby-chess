@@ -1,5 +1,5 @@
-require './Piece'
-require './Error'
+require './piece'
+require './error'
 
 class Board
   attr_reader :grid
@@ -7,6 +7,7 @@ class Board
   def initialize
     @grid = Array.new(8) { Array.new(8) }
     populate_board
+    nil
   end
 
   def [](row, col)
@@ -60,8 +61,8 @@ class Board
     [1, 6].each do |row|
       8.times do |col|
         pos = [row, col]
-        self[row, col] = Pawn.new(:black, pos) if row == 1
-        self[row, col] = Pawn.new(:white, pos) if row == 6
+        self[row, col] = Pawn.new(:black, pos, self) if row == 1
+        self[row, col] = Pawn.new(:white, pos, self) if row == 6
       end
     end
   end
@@ -72,20 +73,20 @@ class Board
         pos = [row, col]
         case col
         when 0, 7
-          self[row, col] = Rook.new(:black, pos) if row == 0
-          self[row, col] = Rook.new(:white, pos) if row == 7
+          self[row, col] = Rook.new(:black, pos, self) if row == 0
+          self[row, col] = Rook.new(:white, pos, self) if row == 7
         when 1, 6
-          self[row, col] = Knight.new(:black, pos) if row == 0
-          self[row, col] = Knight.new(:white, pos) if row == 7
+          self[row, col] = Knight.new(:black, pos, self) if row == 0
+          self[row, col] = Knight.new(:white, pos, self) if row == 7
         when 2, 5
-          self[row, col] = Bishop.new(:black, pos) if row == 0
-          self[row, col] = Bishop.new(:white, pos) if row == 7
+          self[row, col] = Bishop.new(:black, pos, self) if row == 0
+          self[row, col] = Bishop.new(:white, pos, self) if row == 7
         when 3
-          self[row, col] = Queen.new(:black, pos) if row == 0
-          self[row, col] = Queen.new(:white, pos) if row == 7
+          self[row, col] = Queen.new(:black, pos, self) if row == 0
+          self[row, col] = Queen.new(:white, pos, self) if row == 7
         when 4
-          self[row, col] = King.new(:black, pos) if row == 0
-          self[row, col] = King.new(:white, pos) if row == 7
+          self[row, col] = King.new(:black, pos, self) if row == 0
+          self[row, col] = King.new(:white, pos, self) if row == 7
         end
       end
     end
@@ -95,7 +96,7 @@ class Board
     [2, 3, 4, 5].each do |row|
       8.times do |col|
         pos = [row, col]
-        self[row, col] = EmptyPiece.new(:empty, pos)
+        self[row, col] = EmptyPiece.new(:empty, pos, self)
       end
     end
   end
