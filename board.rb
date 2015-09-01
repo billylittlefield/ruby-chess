@@ -21,7 +21,7 @@ class Board
   def move(start_pos, end_pos)
     start_piece = self[*start_pos]
     end_piece = self[*end_pos]
-    if start_piece.valid_moves.include?(end_pos)
+    if start_piece.moves.include?(end_pos)
       move_piece(start_piece, end_piece)
     else
       raise InvalidMoveError
@@ -47,7 +47,6 @@ class Board
     e = end_piece.pos
     start_piece.update_pos(e)
     end_piece.update_pos(s)
-
     self[s], self[e] = self[e], self[s]
   end
 
@@ -55,9 +54,6 @@ class Board
     populate_pieces(:pawn)
     populate_pieces(:other_pieces)
     populate_pieces(:empty)
-    # populate_pawns
-    # populate_other_pieces
-    # populate_empty_pieces
   end
 
   def populate_pieces(kind_of_piece)
@@ -103,45 +99,5 @@ class Board
       self[*pos] = EmptyPiece.new(color, pos, self)
     end
   end
-=begin
-  def populate_pawns
-    [1, 6].each do |row|
-      8.times do |col|
-        pos = [row, col]
-        color = row.odd? ? :black : :white
-        self[row, col] = Pawn.new(color, pos, self)
-      end
-    end
-  end
 
-  def populate_other_pieces
-    [0, 7].each do |row|
-      8.times do |col|
-        pos = [row, col]
-        color = row.even? ? :black : :white
-        case col
-        when 0, 7
-          self[row, col] = Rook.new(color, pos, self)
-        when 1, 6
-          self[row, col] = Knight.new(color, pos, self)
-        when 2, 5
-          self[row, col] = Bishop.new(color, pos, self)
-        when 3
-          self[row, col] = Queen.new(color, pos, self)
-        when 4
-          self[row, col] = King.new(color, pos, self)
-        end
-      end
-    end
-  end
-
-  def populate_empty_pieces
-    [2, 3, 4, 5].each do |row|
-      8.times do |col|
-        pos = [row, col]
-        self[row, col] = EmptyPiece.new(:empty, pos, self)
-      end
-    end
-  end
-=end
 end

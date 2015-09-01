@@ -1,12 +1,13 @@
 require './display.rb'
 class Piece
 
-  attr_reader :pos, :board, :color
+  attr_reader :pos, :board, :color, :moved
 
   def initialize(color, pos, board)
     @color = color
     @board = board
     @pos = pos
+    @moved = false
   end
 
   def present?
@@ -17,16 +18,13 @@ class Piece
     possible_moves
   end
 
-  def valid_moves
-    valid_moves
-  end
-
   def possible_moves
     raise NotImplementedError
   end
 
   def update_pos(new_pos)
     self.pos = new_pos
+    self.moved = true
   end
 
   def generate_all_deltas(delta_1, delta_2)
@@ -42,6 +40,10 @@ class Piece
     ].uniq
   end
 
+  def pos_with_deltas(pos, deltas)
+    deltas.map.with_index{|row_or_col_delta, i| row_or_col_delta + pos[i]}
+  end
+
 end
 
 module Slideable
@@ -49,10 +51,9 @@ module Slideable
   def generate_possible_moves(delta_1, delta_2)
     possible_moves = []
     generate_all_deltas(delta_1, delta_2).each do |deltas|
-      p "deltas are: #{deltas}"
       unable_to_proceed = false
       until unable_to_proceed
-        shifted_pos = deltas.map.with_index{|delta, index| delta + pos[index]}
+        shifted_pos = pos_with_deltas(pos, deltas)
         break unless board.in_bounds?(shifted_pos)
         other_piece = board[*shifted_pos]
         if other_piece.color != color
@@ -82,10 +83,9 @@ module Steppable
   def generate_possible_moves(delta_1, delta_2)
     possible_moves = []
     generate_all_deltas(delta_1, delta_2).each do |deltas|
-      shifted_pos = deltas.map.with_index{|delta, index| delta + pos[index]}
+      shifted_pos = pos_with_deltas(pos, deltas)
       possible_moves << shifted_pos
     end
-
     possible_moves.select do |possible_move|
       piece = board[*possible_move]
       piece.color != color && board.in_bounds?(possible_move)
@@ -105,6 +105,43 @@ class EmptyPiece < Piece
 end
 
 class Pawn < Piece
+
+  def possible_moves
+    possible_diagonal_pawn_moves + possible_forward_pawn_moves
+  end
+
+  def possible_diagonal_pawn_moves
+    pos_in_diagonals = []
+    all_deltas_to_go_diagonal.each do |diag_deltas|
+      pos_in_diagonals << pos_with_deltas(pos, diag_deltas)
+    end
+    pos_in_diagonals.select do |pos_in_diagonal|
+      diag_piece = board[*pos_in_diagonal] if board.in_bounds?(pos_in_diagonal)
+      diag_piece && diag_piece.present? && diag_piece.color != color
+    end
+  end
+
+  def possible_forward_pawn_moves
+    possible_forward_pawn_moves = []
+    pos_in_front = pos_with_deltas(pos, deltas_to_go_forward)
+    pos_2_in_front = pos_with_deltas(pos_in_front, deltas_to_go_forward)
+    if !board[*pos_in_front].present?
+      possible_forward_pawn_moves << pos_in_front
+      if !board[*pos_2_in_front].present? && !moved
+        possible_forward_pawn_moves << pos_2_in_front
+      end
+    end
+    possible_forward_pawn_moves
+  end
+
+  def deltas_to_go_forward
+    color == :white ? [-1, 0] : [1, 0]
+  end
+
+  def all_deltas_to_go_diagonal
+    color == :white ? [[-1, 1], [-1, -1]] : [[1, 1], [1, -1]]
+  end
+
   def to_s
     "P "
   end
@@ -177,10 +214,11 @@ if __FILE__ == $PROGRAM_NAME
   board = Board.new
   @display = Display.new(board)
   @display.render
-  board[1,2] = EmptyPiece.new(:empty, [1,2], self)
-  board[1,3] = EmptyPiece.new(:empty, [1,3], self)
-  board[1,4] = EmptyPiece.new(:empty, [1,4], self)
-  q = board[0,3]
+  # board[1,2] = EmptyPiece.new(:empty, [1,2], self)
+  # board[1,3] = EmptyPiece.new(:empty, [1,3], self)
+  # board[1,4] = EmptyPiece.new(:empty, [1,4], self)
+  pawn = board[1,0]
+  board[2, 1]= Knight.new(:black, [3,0], board)
   @display.render
-  p q.possible_moves
+  p pawn.possible_moves
 end
