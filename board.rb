@@ -21,7 +21,7 @@ class Board
   def move(start_pos, end_pos)
     start_piece = self[*start_pos]
     end_piece = self[*end_pos]
-    if start_piece.moves.include?(end_pos)
+    if start_piece.valid_moves.include?(end_pos)
       move_piece(start_piece, end_piece)
     else
       raise InvalidMoveError
@@ -49,6 +49,14 @@ class Board
     false
   end
 
+  def checkmate?(color)
+    each do |piece|
+      next if piece.color != color
+      return false if piece.valid_moves.length > 0
+    end
+    true
+  end
+
   def each(&prc)
     grid.each do |row|
       row.each do |cell|
@@ -64,16 +72,6 @@ class Board
     raise NoKingFoundError
   end
 
-  private
-
-  def move_piece(start_piece, end_piece)
-    if end_piece.present?
-      kill_piece(start_piece, end_piece)
-    else
-      swap_piece(start_piece, end_piece)
-    end
-  end
-
   def swap_piece(start_piece, end_piece)
     s = start_piece.pos
     e = end_piece.pos
@@ -84,9 +82,20 @@ class Board
     self[*e] = temp
   end
 
+  private
+
+  def move_piece(start_piece, end_piece)
+    if end_piece.present?
+      kill_piece(start_piece, end_piece)
+    else
+      swap_piece(start_piece, end_piece)
+    end
+  end
+
+
   def kill_piece(start_piece, end_piece)
     piece_killed = EmptyPiece.new(:empty, end_piece.pos, self)
-    self[*end_piece.pos] = piece_killed 
+    self[*end_piece.pos] = piece_killed
     swap_piece(start_piece, piece_killed)
   end
 

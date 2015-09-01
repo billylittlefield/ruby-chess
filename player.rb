@@ -41,7 +41,7 @@ class Player
   def get_end_pos(start_piece)
     end_pos = select_pos
     raise SamePieceSelectedError if end_pos == start_piece.pos
-    raise InvalidMoveError if !start_piece.moves.include?(end_pos)
+    raise InvalidMoveError if !start_piece.valid_moves.include?(end_pos)
     end_pos
   rescue InvalidMoveError
    retry

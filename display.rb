@@ -30,7 +30,7 @@ class Display
       bg = :yellow
     elsif [i, j] == @selected_pos
       bg = :light_green
-    elsif !@selected_pos.nil? && board[*@selected_pos].moves.include?([i, j])
+    elsif !@selected_pos.nil? && board[*@selected_pos].valid_moves.include?([i, j])
       bg = :light_green
     elsif (i + j).odd?
       bg = :blue

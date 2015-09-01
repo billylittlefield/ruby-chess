@@ -15,17 +15,29 @@ class Piece
   end
 
   def moves
+    possible_moves
+  end
+
+  def valid_moves
+    moves.reject do |move|
+      move_into_check?(move)
+    end
+  end
+
+  def possible_moves
     raise NotImplementedError
   end
 
-  def move_into_check?(pos)
-    #store the piece and endpiece before moving
-    #move the piece
-    #see if board is in check, save the boolean result
-    #move the piece back if true
-
+  def move_into_check?(end_pos)
+    piece_moved = moved
+    start_color = color
+    end_piece = board[*end_pos]
+    board.swap_piece(self, end_piece)
+    move_into_check = board.in_check?(start_color)
+    board.swap_piece(self, end_piece)
+    self.moved = piece_moved
+    move_into_check
   end
-
 
   def update_pos(new_pos)
     self.pos = new_pos
@@ -104,7 +116,7 @@ class EmptyPiece < Piece
     false
   end
 
-  def moves
+  def possible_moves
     []
   end
 
@@ -115,7 +127,7 @@ end
 
 class Pawn < Piece
 
-  def moves
+  def possible_moves
     possible_diagonal_pawn_moves + possible_forward_pawn_moves
   end
 
@@ -159,7 +171,7 @@ end
 class Rook < Piece
   include Slideable
 
-  def moves
+  def possible_moves
     generate_possible_moves(1, 0)
   end
 
@@ -172,7 +184,7 @@ end
 class Bishop < Piece
   include Slideable
 
-  def moves
+  def possible_moves
     generate_possible_moves(1, 1)
   end
 
@@ -184,7 +196,7 @@ end
 class Queen < Piece
   include Slideable
 
-  def moves
+  def possible_moves
     generate_possible_moves(1, 1) + generate_possible_moves(1, 0)
   end
 
@@ -196,7 +208,7 @@ end
 class Knight < Piece
   include Steppable
 
-  def moves
+  def possible_moves
     generate_possible_moves(1, 2)
   end
 
@@ -209,7 +221,7 @@ end
 class King < Piece
   include Steppable
 
-  def moves
+  def possible_moves
     generate_possible_moves(1, 1) + generate_possible_moves(1, 0)
   end
 
