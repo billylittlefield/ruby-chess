@@ -1,7 +1,8 @@
 require './display.rb'
 class Piece
 
-  attr_reader :pos, :board, :color, :moved
+  attr_reader :board, :color
+  attr_accessor :pos, :moved
 
   def initialize(color, pos, board)
     @color = color
@@ -87,8 +88,8 @@ module Steppable
       possible_moves << shifted_pos
     end
     possible_moves.select do |possible_move|
-      piece = board[*possible_move]
-      piece.color != color && board.in_bounds?(possible_move)
+      piece = board[*possible_move] if board.in_bounds?(possible_move)
+      piece && piece.color != color
     end
   end
 
@@ -97,6 +98,10 @@ end
 class EmptyPiece < Piece
   def present?
     false
+  end
+
+  def possible_moves
+    []
   end
 
   def to_s
@@ -143,7 +148,7 @@ class Pawn < Piece
   end
 
   def to_s
-    "P "
+    color == :white ? "♙ " : "♟ " 
   end
 end
 
@@ -155,7 +160,7 @@ class Rook < Piece
   end
 
   def to_s
-    "R "
+    color == :white ? "♖ " : "♜ "
   end
 
 end
@@ -168,7 +173,7 @@ class Bishop < Piece
   end
 
   def to_s
-    "B "
+    color == :white ? "♗ " : "♝ "
   end
 end
 
@@ -180,7 +185,7 @@ class Queen < Piece
   end
 
   def to_s
-    "Q "
+    color == :white ? "♕ " : "♛ "
   end
 end
 
@@ -192,7 +197,7 @@ class Knight < Piece
   end
 
   def to_s
-    "N "
+    color == :white ? "♘ " : "♞ "
   end
 
 end
@@ -205,7 +210,7 @@ class King < Piece
   end
 
   def to_s
-    "K "
+    color == :white ? "♔ " : "♚ "
   end
 end
 

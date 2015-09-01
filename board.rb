@@ -37,7 +37,31 @@ class Board
   end
 
   def rows
-    @grid
+    grid
+  end
+
+  def in_check?(color)
+    opp_color = (color == :white) ? :black : :white
+    king_pos = find_king(color)
+    each do |piece|
+      return true if piece.color != color && piece.moves.include?(king_pos)
+    end
+    false
+  end
+
+  def each(&prc)
+    grid.each do |row|
+      row.each do |cell|
+        prc.call(cell)
+      end
+    end
+  end
+
+  def find_king(color)
+    each do |piece|
+      return piece.pos if piece.is_a?(King) && piece.color == color
+    end
+    raise NoKingFoundError
   end
 
   private
@@ -47,7 +71,11 @@ class Board
     e = end_piece.pos
     start_piece.update_pos(e)
     end_piece.update_pos(s)
-    self[s], self[e] = self[e], self[s]
+    puts "start is #{s} and end is #{e}"
+    temp = self[*s]
+    self[*s] = self[*e]
+    self[*e] = temp
+    puts "In_check: white: #{in_check?(:white)} and black: #{in_check?(:black)}"
   end
 
   def populate_board
@@ -58,20 +86,16 @@ class Board
 
   def populate_pieces(kind_of_piece)
     case kind_of_piece
-    when :pawn
-      selected_rows = [1, 6]
-    when :other_pieces
-      selected_rows = [0, 7]
-    when :empty
-      selected_rows = [2, 3, 4, 5]
-      color = kind_of_piece
+    when :pawn         ; selected_rows = [1, 6]
+    when :other_pieces ; selected_rows = [0, 7]
+    when :empty        ; selected_rows = [2, 3, 4, 5]
     else
       raise InvalidPieceError
     end
     selected_rows.each do |row|
       8.times do |col|
         pos = [row, col]
-        color ||= selected_rows.first == row ? :black : :white
+        color = (selected_rows.first == row) ? :black : :white
         instantiate_and_set_piece(kind_of_piece, color, pos)
       end
     end
@@ -96,7 +120,7 @@ class Board
         raise ColumnOutOfRangeError
       end
     else
-      self[*pos] = EmptyPiece.new(color, pos, self)
+      self[*pos] = EmptyPiece.new(:empty, pos, self)
     end
   end
 

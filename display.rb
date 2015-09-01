@@ -35,8 +35,7 @@ class Display
 
   def render
     system("clear")
-    puts "Fill the grid!"
-    puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
+    puts "Please select a position to move from and to."
     build_grid.each { |row| puts row.join }
     puts "  " * 50
   end

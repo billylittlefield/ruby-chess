@@ -8,8 +8,6 @@ class Game
   end
 
   def run
-    puts "Mark all the spaces on the board!"
-    puts "WASD or arrow keys to move the cursor, enter or space to confirm."
     until @board.game_over?
       pos = @player.move
     end

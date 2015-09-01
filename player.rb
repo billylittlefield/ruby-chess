@@ -1,13 +1,21 @@
 require_relative "display"
 
 class Player
+
+  attr_reader :board
+
   def initialize(board)
     @display = Display.new(board)
+    @board = board
   end
 
   def move
-    select_pos
-    #select end_pos
+    start_pos = select_pos
+    end_pos = select_pos
+    board.move(start_pos, end_pos)
+  rescue InvalidMoveError
+    puts "Invalid move, please pick a valid move"
+    retry
   end
 
   def select_pos
