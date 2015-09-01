@@ -51,21 +51,16 @@ module Slideable
     generate_all_deltas(delta_1, delta_2).each do |deltas|
       unable_to_proceed = false
       until unable_to_proceed
-        # puts deltas
-        # sleep(1)
         shifted_pos = deltas.map.with_index{|delta, index| delta + pos[index]}
         break unless board.in_bounds?(shifted_pos)
         other_piece = board[*shifted_pos]
         if other_piece.color != color
           possible_moves << shifted_pos
           unable_to_proceed = true if other_piece.present?
-          # puts "a + #{shifted_pos} + #{unable_to_proceed}"
         else
           unable_to_proceed = true
-          # puts "b + #{other_piece.pos}"
         end
         deltas.map! {|delta| delta.zero? ? 0 : (delta + 1) }
-        # puts "Deltas are: #{deltas}"
       end
     end
     possible_moves
