@@ -52,17 +52,64 @@ class Board
   end
 
   def populate_board
-    populate_pawns
-    populate_other_pieces
-    populate_empty_pieces
+    populate_pieces(:pawn)
+    populate_pieces(:other_pieces)
+    populate_pieces(:empty)
+    # populate_pawns
+    # populate_other_pieces
+    # populate_empty_pieces
   end
 
+  def populate_pieces(kind_of_piece)
+    case kind_of_piece
+    when :pawn
+      selected_rows = [1, 6]
+    when :other_pieces
+      selected_rows = [0, 7]
+    when :empty
+      selected_rows = [2, 3, 4, 5]
+      color = kind_of_piece
+    else
+      raise InvalidPieceError
+    end
+    selected_rows.each do |row|
+      8.times do |col|
+        pos = [row, col]
+        color ||= selected_rows.first == row ? :black : :white
+        instantiate_and_set_piece(kind_of_piece, color, pos)
+      end
+    end
+  end
+
+  def instantiate_and_set_piece(kind_of_piece, color, pos)
+    if kind_of_piece == :pawn
+      self[*pos] = Pawn.new(color, pos, self)
+    elsif kind_of_piece == :other_pieces
+      case pos[1]
+      when 0, 7
+        self[*pos] = Rook.new(color, pos, self)
+      when 1, 6
+        self[*pos] = Knight.new(color, pos, self)
+      when 2, 5
+        self[*pos] = Bishop.new(color, pos, self)
+      when 3
+        self[*pos] = Queen.new(color, pos, self)
+      when 4
+        self[*pos] = King.new(color, pos, self)
+      else
+        raise ColumnOutOfRangeError
+      end
+    else
+      self[*pos] = EmptyPiece.new(color, pos, self)
+    end
+  end
+=begin
   def populate_pawns
     [1, 6].each do |row|
       8.times do |col|
         pos = [row, col]
-        self[row, col] = Pawn.new(:black, pos, self) if row == 1
-        self[row, col] = Pawn.new(:white, pos, self) if row == 6
+        color = row.odd? ? :black : :white
+        self[row, col] = Pawn.new(color, pos, self)
       end
     end
   end
@@ -71,22 +118,18 @@ class Board
     [0, 7].each do |row|
       8.times do |col|
         pos = [row, col]
+        color = row.even? ? :black : :white
         case col
         when 0, 7
-          self[row, col] = Rook.new(:black, pos, self) if row == 0
-          self[row, col] = Rook.new(:white, pos, self) if row == 7
+          self[row, col] = Rook.new(color, pos, self)
         when 1, 6
-          self[row, col] = Knight.new(:black, pos, self) if row == 0
-          self[row, col] = Knight.new(:white, pos, self) if row == 7
+          self[row, col] = Knight.new(color, pos, self)
         when 2, 5
-          self[row, col] = Bishop.new(:black, pos, self) if row == 0
-          self[row, col] = Bishop.new(:white, pos, self) if row == 7
+          self[row, col] = Bishop.new(color, pos, self)
         when 3
-          self[row, col] = Queen.new(:black, pos, self) if row == 0
-          self[row, col] = Queen.new(:white, pos, self) if row == 7
+          self[row, col] = Queen.new(color, pos, self)
         when 4
-          self[row, col] = King.new(:black, pos, self) if row == 0
-          self[row, col] = King.new(:white, pos, self) if row == 7
+          self[row, col] = King.new(color, pos, self)
         end
       end
     end
@@ -100,5 +143,5 @@ class Board
       end
     end
   end
-
+=end
 end
