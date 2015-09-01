@@ -49,6 +49,7 @@ module Slideable
   def generate_possible_moves(delta_1, delta_2)
     possible_moves = []
     generate_all_deltas(delta_1, delta_2).each do |deltas|
+      p "deltas are: #{deltas}"
       unable_to_proceed = false
       until unable_to_proceed
         shifted_pos = deltas.map.with_index{|delta, index| delta + pos[index]}
@@ -60,7 +61,15 @@ module Slideable
         else
           unable_to_proceed = true
         end
-        deltas.map! {|delta| delta.zero? ? 0 : (delta + 1) }
+        deltas.map! do |delta|
+          if delta.zero?
+            0
+          elsif delta > 0
+            delta + 1
+          else
+            delta - 1
+          end
+        end
       end
     end
     possible_moves
