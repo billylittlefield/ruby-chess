@@ -6,6 +6,11 @@ class Player
   end
 
   def move
+    select_pos
+    #select end_pos
+  end
+
+  def select_pos
     result = nil
     until result
       @display.render

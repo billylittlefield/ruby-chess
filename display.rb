@@ -26,11 +26,11 @@ class Display
     if [i, j] == @cursor_pos
       bg = :light_red
     elsif (i + j).odd?
-      bg = :light_blue
-    else
       bg = :blue
+    else
+      bg = :light_white
     end
-    { background: bg, color: :white }
+    { background: bg, color: :black }
   end
 
   def render
@@ -38,5 +38,6 @@ class Display
     puts "Fill the grid!"
     puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
     build_grid.each { |row| puts row.join }
+    puts "  " * 50
   end
 end
