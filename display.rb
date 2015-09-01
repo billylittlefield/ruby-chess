@@ -4,9 +4,12 @@ require_relative "cursorable"
 class Display
   include Cursorable
 
+  attr_reader :board
+
   def initialize(board)
     @board = board
     @cursor_pos = [0, 0]
+    @selected_pos = nil
   end
 
   def build_grid
@@ -24,7 +27,11 @@ class Display
 
   def colors_for(i, j)
     if [i, j] == @cursor_pos
-      bg = :light_red
+      bg = :yellow
+    elsif [i, j] == @selected_pos
+      bg = :light_green
+    elsif !@selected_pos.nil? && board[*@selected_pos].moves.include?([i, j])
+      bg = :light_green
     elsif (i + j).odd?
       bg = :blue
     else
@@ -38,5 +45,13 @@ class Display
     puts "Please select a position to move from and to."
     build_grid.each { |row| puts row.join }
     puts "  " * 50
+  end
+
+  def reset_selected_pos
+    @selected_pos = nil
+  end
+
+  def set_selected_pos(pos)
+    @selected_pos = pos.dup
   end
 end

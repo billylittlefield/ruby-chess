@@ -67,15 +67,27 @@ class Board
   private
 
   def move_piece(start_piece, end_piece)
+    if end_piece.present?
+      kill_piece(start_piece, end_piece)
+    else
+      swap_piece(start_piece, end_piece)
+    end
+  end
+
+  def swap_piece(start_piece, end_piece)
     s = start_piece.pos
     e = end_piece.pos
     start_piece.update_pos(e)
     end_piece.update_pos(s)
-    puts "start is #{s} and end is #{e}"
     temp = self[*s]
     self[*s] = self[*e]
     self[*e] = temp
-    puts "In_check: white: #{in_check?(:white)} and black: #{in_check?(:black)}"
+  end
+
+  def kill_piece(start_piece, end_piece)
+    piece_killed = EmptyPiece.new(:empty, end_piece.pos, self)
+    self[*end_piece.pos] = piece_killed 
+    swap_piece(start_piece, piece_killed)
   end
 
   def populate_board

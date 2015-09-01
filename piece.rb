@@ -1,4 +1,3 @@
-require './display.rb'
 class Piece
 
   attr_reader :board, :color
@@ -16,12 +15,17 @@ class Piece
   end
 
   def moves
-    possible_moves
-  end
-
-  def possible_moves
     raise NotImplementedError
   end
+
+  def move_into_check?(pos)
+    #store the piece and endpiece before moving
+    #move the piece
+    #see if board is in check, save the boolean result
+    #move the piece back if true
+
+  end
+
 
   def update_pos(new_pos)
     self.pos = new_pos
@@ -100,7 +104,7 @@ class EmptyPiece < Piece
     false
   end
 
-  def possible_moves
+  def moves
     []
   end
 
@@ -111,7 +115,7 @@ end
 
 class Pawn < Piece
 
-  def possible_moves
+  def moves
     possible_diagonal_pawn_moves + possible_forward_pawn_moves
   end
 
@@ -148,14 +152,14 @@ class Pawn < Piece
   end
 
   def to_s
-    color == :white ? "♙ " : "♟ " 
+    color == :white ? "♙ " : "♟ "
   end
 end
 
 class Rook < Piece
   include Slideable
 
-  def possible_moves
+  def moves
     generate_possible_moves(1, 0)
   end
 
@@ -168,7 +172,7 @@ end
 class Bishop < Piece
   include Slideable
 
-  def possible_moves
+  def moves
     generate_possible_moves(1, 1)
   end
 
@@ -180,7 +184,7 @@ end
 class Queen < Piece
   include Slideable
 
-  def possible_moves
+  def moves
     generate_possible_moves(1, 1) + generate_possible_moves(1, 0)
   end
 
@@ -192,7 +196,7 @@ end
 class Knight < Piece
   include Steppable
 
-  def possible_moves
+  def moves
     generate_possible_moves(1, 2)
   end
 
@@ -205,25 +209,11 @@ end
 class King < Piece
   include Steppable
 
-  def possible_moves
+  def moves
     generate_possible_moves(1, 1) + generate_possible_moves(1, 0)
   end
 
   def to_s
     color == :white ? "♔ " : "♚ "
   end
-end
-
-if __FILE__ == $PROGRAM_NAME
-  load 'board.rb'
-  board = Board.new
-  @display = Display.new(board)
-  @display.render
-  # board[1,2] = EmptyPiece.new(:empty, [1,2], self)
-  # board[1,3] = EmptyPiece.new(:empty, [1,3], self)
-  # board[1,4] = EmptyPiece.new(:empty, [1,4], self)
-  pawn = board[1,0]
-  board[2, 1]= Knight.new(:black, [3,0], board)
-  @display.render
-  p pawn.possible_moves
 end
