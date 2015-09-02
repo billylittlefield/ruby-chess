@@ -33,7 +33,7 @@ class Board
   end
 
   def game_over?
-    false
+    checkmate?(:white) || checkmate?(:black)
   end
 
   def rows

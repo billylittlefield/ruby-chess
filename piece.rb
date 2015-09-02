@@ -19,6 +19,7 @@ class Piece
   end
 
   def valid_moves
+    # p "I am a #{self.class} at pos #{pos} and my moves are #{moves}"
     moves.reject do |move|
       move_into_check?(move)
     end
@@ -146,6 +147,8 @@ class Pawn < Piece
     possible_forward_pawn_moves = []
     pos_in_front = pos_with_deltas(pos, deltas_to_go_forward)
     pos_2_in_front = pos_with_deltas(pos_in_front, deltas_to_go_forward)
+    # p "#{self.pos} IS where I'm at #{self.class}"
+    # p "#{pos_in_front} is pos_in_front and #{pos_2_in_front} is pos_2_in_front"
     if !board[*pos_in_front].present?
       possible_forward_pawn_moves << pos_in_front
       if !board[*pos_2_in_front].present? && !moved

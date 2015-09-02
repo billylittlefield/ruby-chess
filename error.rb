@@ -9,3 +9,6 @@ end
 
 class SamePieceSelectedError < StandardError
 end
+
+class WrongColorSelected < StandardError
+end

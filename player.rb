@@ -2,11 +2,12 @@ require_relative "display"
 
 class Player
 
-  attr_reader :board
+  attr_reader :board, :color, :display
 
-  def initialize(board)
+  def initialize(board, color)
     @display = Display.new(board)
     @board = board
+    @color = color
   end
 
   def move
@@ -16,6 +17,7 @@ class Player
     @display.reset_selected_pos
     board.move(start_pos, end_pos)
   rescue SamePieceSelectedError
+    puts "Same piece selected, it is now unselected."
     @display.reset_selected_pos
     retry
   end
@@ -31,10 +33,16 @@ class Player
 
   def get_start_pos
     start_pos = select_pos
-    raise EmptyPieceSelected if !board[*start_pos].present?
+    selected_piece = board[*start_pos]
+    raise EmptyPieceSelected if !selected_piece.present?
+    raise WrongColorSelected if selected_piece.color != color
     @display.set_selected_pos(start_pos)
     start_pos
   rescue EmptyPieceSelected
+    puts "Empty piece was selected, please pick a piece of your color"
+    retry
+  rescue WrongColorSelected
+    puts "Wrong color piece selected, please pick a piece of your color"
     retry
   end
 
