@@ -44,7 +44,9 @@ class Display
 
   def render
     system("clear")
+    puts "  " * 50
     puts "Please select a position to move from and to."
+    puts "  " * 50
     build_grid.each { |row| puts row.join }
     puts "  " * 50
   end
