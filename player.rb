@@ -4,8 +4,9 @@ class Player
 
   attr_reader :board, :color, :display
 
-  def initialize(board, color)
+  def initialize(name, board, color)
     @display = Display.new(board)
+    @name = name
     @board = board
     @color = color
   end

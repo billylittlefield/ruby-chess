@@ -7,26 +7,29 @@ class Game
 
   def initialize
     @board = Board.new
-    @player1 = Player.new(@board, :white)
-    @player2 = Player.new(@board, :black)
+    @player1 = Player.new("Billy", @board, :white)
+    @player2 = Player.new("Vic", @board, :black)
     @players = [@player1, @player2]
   end
 
   def run
     until game_over?
-      # User current player helper
-      @players.first.move
-      next_player
+      current_player.move
+      next_player!
     end
-    @player1.display.render
-    puts "Game over! #{@player.last} won!!"
+    current_player.display.render
+    puts "Game over! #{@players.last} won!!"
   end
 
-  def next_player
+  def next_player!
     @players.rotate!
   end
 
   private
+
+  def current_player
+    @players.first
+  end
 
   def game_over?
     @board.game_over?

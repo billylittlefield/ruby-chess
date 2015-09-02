@@ -69,7 +69,6 @@ class Board
     each do |piece|
       return piece.pos if piece.is_a?(King) && piece.color == color
     end
-    # Enumerable find
     raise NoKingFoundError
   end
 
@@ -81,7 +80,18 @@ class Board
     temp = self[*s]
     self[*s] = self[*e]
     self[*e] = temp
-    # self[*s], self[*e] = self[*e], self[*s]
+  end
+
+  def kill_piece(start_piece, end_piece)
+    piece_killed = EmptyPiece.new(:empty, end_piece.pos, self)
+    self[*end_piece.pos] = piece_killed
+    swap_piece(start_piece, piece_killed)
+  end
+
+  def unkill_piece(killed_piece, killed_pos, killer_piece, killer_orig_pos)
+    self[*killed_pos] = killed_piece
+    self[*killer_orig_pos] = killer_piece
+    killer_piece.update_pos(killer_orig_pos)
   end
 
   private
@@ -92,13 +102,6 @@ class Board
     else
       swap_piece(start_piece, end_piece)
     end
-  end
-
-
-  def kill_piece(start_piece, end_piece)
-    piece_killed = EmptyPiece.new(:empty, end_piece.pos, self)
-    self[*end_piece.pos] = piece_killed
-    swap_piece(start_piece, piece_killed)
   end
 
   def populate_board

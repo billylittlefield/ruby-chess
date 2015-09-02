@@ -19,7 +19,6 @@ class Piece
   end
 
   def valid_moves
-    # p "I am a #{self.class} at pos #{pos} and my moves are #{moves}"
     moves.reject do |move|
       move_into_check?(move)
     end
@@ -32,10 +31,18 @@ class Piece
   def move_into_check?(end_pos)
     piece_moved = moved
     start_color = color
+    start_orig_pos = pos.dup
     end_piece = board[*end_pos]
-    board.swap_piece(self, end_piece)
-    move_into_check = board.in_check?(start_color)
-    board.swap_piece(self, end_piece)
+    if !end_piece.present?
+      board.swap_piece(self, end_piece)
+      move_into_check = board.in_check?(start_color)
+      board.swap_piece(self, end_piece)
+    else
+      resurrected_piece = end_piece.deep_dup
+      board.kill_piece(self, end_piece)
+      move_into_check = board.in_check?(start_color)
+      board.unkill_piece(resurrected_piece, end_pos, self, start_orig_pos)
+    end
     self.moved = piece_moved
     move_into_check
   end
@@ -44,6 +51,13 @@ class Piece
     self.pos = new_pos
     self.moved = true
   end
+
+  def deep_dup
+    klass = self.class
+    klass.new(color, pos.dup, board)
+  end
+
+  private
 
   def generate_all_deltas(delta_1, delta_2)
     [
@@ -71,29 +85,25 @@ module Slideable
   def generate_possible_moves(delta_1, delta_2)
     possible_moves = []
     generate_all_deltas(delta_1, delta_2).each do |deltas|
-      unable_to_proceed = false
-      until unable_to_proceed
-        shifted_pos = pos_with_deltas(pos, deltas)
-        break unless board.in_bounds?(shifted_pos)
-        other_piece = board[*shifted_pos]
-        if other_piece.color != color
-          possible_moves << shifted_pos
-          unable_to_proceed = true if other_piece.present?
-        else
-          unable_to_proceed = true
-        end
-        deltas.map! do |delta|
-          if delta.zero?
-            0
-          elsif delta > 0
-            delta + 1
-          else
-            delta - 1
-          end
-        end
-      end
+      possible_moves += extend_in_direction(deltas)
     end
     possible_moves
+  end
+
+  def extend_in_direction(deltas)
+    extended_moves = []
+    unable_to_proceed = false
+    shifted_pos = pos.dup
+    until unable_to_proceed
+      shifted_pos = pos_with_deltas(shifted_pos, deltas)
+      break if !board.in_bounds?(shifted_pos)
+      other_piece = board[*shifted_pos]
+      if other_piece.color != color
+        extended_moves << shifted_pos
+      end
+      unable_to_proceed = true if other_piece.present?
+    end
+    extended_moves
   end
 
 end
@@ -149,8 +159,6 @@ class Pawn < Piece
     possible_forward_pawn_moves = []
     pos_in_front = pos_with_deltas(pos, deltas_to_go_forward)
     pos_2_in_front = pos_with_deltas(pos_in_front, deltas_to_go_forward)
-    # p "#{self.pos} IS where I'm at #{self.class}"
-    # p "#{pos_in_front} is pos_in_front and #{pos_2_in_front} is pos_2_in_front"
     if !board[*pos_in_front].present?
       possible_forward_pawn_moves << pos_in_front
       if !board[*pos_2_in_front].present? && !moved
