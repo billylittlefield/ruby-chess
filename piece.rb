@@ -59,13 +59,15 @@ class Piece
   end
 
   def pos_with_deltas(pos, deltas)
-    deltas.map.with_index{|row_or_col_delta, i| row_or_col_delta + pos[i]}
+    deltas.map.with_index{ |row_or_col_delta, i| row_or_col_delta + pos[i] }
   end
 
 end
 
 module Slideable
 
+
+  #Refactor to make more consise and readable
   def generate_possible_moves(delta_1, delta_2)
     possible_moves = []
     generate_all_deltas(delta_1, delta_2).each do |deltas|

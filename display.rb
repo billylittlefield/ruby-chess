@@ -5,11 +5,13 @@ class Display
   include Cursorable
 
   attr_reader :board
+  attr_accessor :highlighted_moves
 
   def initialize(board)
     @board = board
     @cursor_pos = [0, 0]
     @selected_pos = nil
+    @highlighted_moves = []
   end
 
   def build_grid
@@ -30,7 +32,7 @@ class Display
       bg = :yellow
     elsif [i, j] == @selected_pos
       bg = :light_green
-    elsif !@selected_pos.nil? && board[*@selected_pos].valid_moves.include?([i, j])
+    elsif !@selected_pos.nil? && @highlighted_moves.include?([i, j])
       bg = :light_green
     elsif (i + j).odd?
       bg = :blue

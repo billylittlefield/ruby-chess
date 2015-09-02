@@ -13,8 +13,9 @@ class Game
   end
 
   def run
-    until @board.game_over?
-      pos = @players.first.move
+    until game_over?
+      # User current player helper
+      @players.first.move
       next_player
     end
     @player1.display.render
@@ -25,6 +26,11 @@ class Game
     @players.rotate!
   end
 
+  private
+
+  def game_over?
+    @board.game_over?
+  end
 end
 
 if __FILE__ == $PROGRAM_NAME

@@ -13,6 +13,7 @@ class Player
   def move
     start_pos = get_start_pos
     start_piece = board[*start_pos]
+    p @display.highlighted_moves
     end_pos = get_end_pos(start_piece)
     @display.reset_selected_pos
     board.move(start_pos, end_pos)
@@ -33,6 +34,7 @@ class Player
 
   def get_start_pos
     start_pos = select_pos
+    @display.highlighted_moves = board[*start_pos].valid_moves
     selected_piece = board[*start_pos]
     raise EmptyPieceSelected if !selected_piece.present?
     raise WrongColorSelected if selected_piece.color != color
@@ -48,6 +50,7 @@ class Player
 
   def get_end_pos(start_piece)
     end_pos = select_pos
+    @display.highlighted_moves = []
     raise SamePieceSelectedError if end_pos == start_piece.pos
     raise InvalidMoveError if !start_piece.valid_moves.include?(end_pos)
     end_pos

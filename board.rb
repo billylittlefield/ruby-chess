@@ -7,7 +7,6 @@ class Board
   def initialize
     @grid = Array.new(8) { Array.new(8) }
     populate_board
-    nil
   end
 
   def [](row, col)
@@ -55,6 +54,7 @@ class Board
       return false if piece.valid_moves.length > 0
     end
     true
+    # any { |piece| piece.color == color && !piece.valid_moves.empty?}
   end
 
   def each(&prc)
@@ -69,6 +69,7 @@ class Board
     each do |piece|
       return piece.pos if piece.is_a?(King) && piece.color == color
     end
+    # Enumerable find
     raise NoKingFoundError
   end
 
@@ -80,6 +81,7 @@ class Board
     temp = self[*s]
     self[*s] = self[*e]
     self[*e] = temp
+    # self[*s], self[*e] = self[*e], self[*s]
   end
 
   private
