@@ -2,7 +2,7 @@ require_relative "display"
 
 class Player
 
-  attr_reader :board, :color, :display
+  attr_reader :board, :color, :display, :name
 
   def initialize(name, board, color)
     @display = Display.new(board)
@@ -12,13 +12,15 @@ class Player
   end
 
   def move
+    @display.render
     start_pos = get_start_pos
+    @display.render
     start_piece = board[*start_pos]
-    p @display.highlighted_moves
     end_pos = get_end_pos(start_piece)
     @display.reset_selected_pos
     board.move(start_pos, end_pos)
   rescue SamePieceSelectedError
+    @display.render
     puts "Same piece selected, it is now unselected."
     @display.reset_selected_pos
     retry
@@ -27,8 +29,8 @@ class Player
   def select_pos
     result = nil
     until result
-      @display.render
       result = @display.get_input
+      @display.render
     end
     result
   end
@@ -42,9 +44,11 @@ class Player
     @display.set_selected_pos(start_pos)
     start_pos
   rescue EmptyPieceSelected
+    @display.render
     puts "Empty piece was selected, please pick a piece of your color"
     retry
   rescue WrongColorSelected
+    @display.render
     puts "Wrong color piece selected, please pick a piece of your color"
     retry
   end
@@ -57,6 +61,10 @@ class Player
     end_pos
   rescue InvalidMoveError
    retry
+  end
+
+  def to_s
+    name
   end
 
 end

@@ -29,13 +29,13 @@ class Display
 
   def colors_for(i, j)
     if [i, j] == @cursor_pos
-      bg = :yellow
+      bg = :cyan
     elsif [i, j] == @selected_pos
       bg = :light_green
     elsif !@selected_pos.nil? && @highlighted_moves.include?([i, j])
       bg = :light_green
     elsif (i + j).odd?
-      bg = :blue
+      bg = :white
     else
       bg = :light_white
     end
@@ -45,7 +45,8 @@ class Display
   def render
     system("clear")
     puts "  " * 50
-    puts "Please select a position to move from and to."
+    puts "Please select a position"
+    puts "to move from and to."
     puts "  " * 50
     build_grid.each { |row| puts row.join }
     puts "  " * 50

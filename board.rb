@@ -1,7 +1,9 @@
-require './piece'
+require './pieces'
 require './error'
 
 class Board
+  include Enumerable
+
   attr_reader :grid
 
   def initialize
@@ -42,19 +44,22 @@ class Board
   def in_check?(color)
     opp_color = (color == :white) ? :black : :white
     king_pos = find_king(color)
-    each do |piece|
-      return true if piece.color != color && piece.moves.include?(king_pos)
+    pieces(opp_color).each do |piece|
+      return true if piece.moves.include?(king_pos)
     end
     false
   end
 
-  def checkmate?(color)
+  def pieces(color)
+    pieces = []
     each do |piece|
-      next if piece.color != color
-      return false if piece.valid_moves.length > 0
+      pieces << piece if piece.color == color
     end
-    true
-    # any { |piece| piece.color == color && !piece.valid_moves.empty?}
+    pieces
+  end
+
+  def checkmate?(color)
+    pieces(color).all? { |piece| piece.valid_moves.empty? }
   end
 
   def each(&prc)
@@ -66,9 +71,7 @@ class Board
   end
 
   def find_king(color)
-    each do |piece|
-      return piece.pos if piece.is_a?(King) && piece.color == color
-    end
+    return pieces(color).select { |piece| piece.is_a?(King) }.first.pos
     raise NoKingFoundError
   end
 
